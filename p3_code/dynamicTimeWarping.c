@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <float.h>
 #include "Signal.h"
 #include "dynamicTimeWarping.h"
 
@@ -38,8 +39,8 @@ double dtw(Signal* s1, Signal* s2, size_t locality){
 	height = s1->size + 1;
 	width = s2->size + 1;
 	double** DTWcosts = newMatrix(height, width);
-	for(int i = 0; i < height; i++)
-		for(int j = 0; j < width; j++)
+	for(size_t i = 0; i < height; i++)
+		for(size_t j = 0; j < width; j++)
 			DTWcosts[i][j] = DBL_MAX;
 	DTWcosts[0][0] = 0;
 
@@ -60,21 +61,61 @@ double dtw(Signal* s1, Signal* s2, size_t locality){
 	return totalDistance;// TODO
 }
 
+/** ------------------------------------------------------------------------ *
+ * Return the maximum of two unsigned values
+ *
+ * PARAMETERS
+ * a             The first value
+ * b             The second value
+ *
+ * RETURN
+ *               The maximum of the two values
+ * ------------------------------------------------------------------------- */
 static size_t max2size_t(const size_t a, const size_t b){
 	return a > b ? a : b;
 }
 
+/** ------------------------------------------------------------------------ *
+ * Return the minimum of two unsigned values
+ *
+ * PARAMETERS
+ * a             The first value
+ * b             The second value
+ *
+ * RETURN
+ *               The minimum of the two values
+ * ------------------------------------------------------------------------- */
 static size_t min2size_t(const size_t a, const size_t b){
 	return a < b ? a : b;
 }
 
+/** ------------------------------------------------------------------------ *
+ * Return the minimum of three double values
+ *
+ * PARAMETERS
+ * a             The first value
+ * b             The second value
+ * c             The third value
+ *
+ * RETURN
+ *               The minimum of the three values
+ * ------------------------------------------------------------------------- */
 static double min3doubles(const double a, const double b, const double c){
 	double maxAB = (a > b ? a : b);
 	return maxAB > c ? maxAB : c;
 }
-/* Computes the mean one norm distance between 2 vectors (ie the sum of the distances of their
-   components divided by the number of components). Returns -1 if the vectors are of different
-   sizes.*/
+/** ------------------------------------------------------------------------ *
+ * Computes the mean one norm distance between two vectors
+ * (the sum of the distances of their components divided by the number of components)
+ *
+ * PARAMETERS
+ * v1       A pointer to the first vector
+ * v2       A pointer to the second vector
+ *
+ * RETURN
+ *          The mean one norm distance between the two vectors
+ *          or -1 if the vectors are of different sizes
+ * ------------------------------------------------------------------------- */
 static double meanOneNormDistance(const vector* v1, const vector* v2){
 	if(v1->size != v2->size)
 		return -1;
@@ -87,6 +128,17 @@ static double meanOneNormDistance(const vector* v1, const vector* v2){
 	return (sumOfDists/v1->size);
 }
 
+/** ------------------------------------------------------------------------ *
+ * Create a height * width matrix
+ *
+ * PARAMETERS
+ * height        The number of lines
+ * width         The number of columns
+ * locality      The maximum shift between the matching
+ *
+ * RETURN
+ * matrix        A new matrix
+ * ------------------------------------------------------------------------- */
 static double** newMatrix(const size_t height, const size_t width){
 	double** matrix = malloc(sizeof(double*)*height);
 	if(!matrix)
@@ -110,6 +162,13 @@ static double** newMatrix(const size_t height, const size_t width){
 	return matrix;
 }
 
+/** ------------------------------------------------------------------------ *
+ * Free the matrix
+ *
+ * PARAMETERS
+ * matrix      The matrix to free
+ *
+ * ------------------------------------------------------------------------- */
 static void freeMatrix(double** matrix, const size_t height){
 	if(!matrix)
 		return;

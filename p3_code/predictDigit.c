@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <float.h>
 #include "Signal.h"
 #include "dynamicTimeWarping.h"
 
@@ -15,8 +16,8 @@
  * ------------------------------------------------------------------------- */
 DigitScore predictDigit(Signal* signal, Database* database, size_t locality){
 	DigitScore digitScore = {DBL_MAX, -1};
-	for(int i = 0; i<10; i++){
-		double score = dtw(signal, Database->samples[i], locality);
+	for(int i = 0; i < 10; i++){
+		double score = dtw(signal, database->samples[i], locality);
 		if(score < digitScore.score){
 			digitScore.score = score;
 			digitScore.digit = i;
