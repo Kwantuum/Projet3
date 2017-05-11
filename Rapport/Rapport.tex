@@ -1,0 +1,124 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[frenchb]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+%\usepackage{a4wide}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathptmx}
+\usepackage{longtable}
+\usepackage[font=small]{caption}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage[dvipsnames,usenames]{color}
+\usepackage{fancyhdr}
+\usepackage{epstopdf}
+\usepackage{bm}
+\usepackage{array}
+\usepackage{mathtools}
+\usepackage[toc,page]{appendix}
+\usepackage{gensymb}
+\usepackage{eurosym}
+\usepackage{epstopdf}
+\usepackage{textcomp}
+\usepackage{tikz}
+\usepackage{amsmath} 
+
+
+\addto\captionsfrench{\def\tablename{Tableau}}
+
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+
+\DeclareUnicodeCharacter{00A0}{~}
+\newcommand{\matr}[1]{\underline{\underline{#1}}}
+
+
+
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+\hypersetup{
+  colorlinks   = true,
+  linkcolor    = black,
+  urlcolor     = black,
+  citecolor    = black
+}
+
+\begin{document}
+
+
+
+
+
+
+
+\setcounter{page}{1}
+
+
+\begin{center}
+
+
+\rule{\linewidth}{0.3mm}
+\LARGE
+INFO0902-1 Structures des données et algorithmes\\
+\vspace{0.3cm}
+\large
+\textbf{Projet 3: Résolution de problèmes}\\
+\vspace{0.3cm}
+\normalsize
+\textit{Bachelier en sciences de l'ingénieur, Bloc 2}\\
+\vspace{0.2cm}
+Samuel Degueldre et Corentin Van Putte\\
+\vspace{0.2cm}
+2016 - 2017\\
+\LARGE
+\rule{\linewidth}{0.3mm}
+ 
+
+\end{center}
+\part{Analyse Théorique}
+
+
+\section{DTW}
+\subsection{Expliquez brièvement le principe de cet algorithme}
+
+L’algorithme consiste à calculer une aligner deux séries temporelles en tenant compte d’éventuelles différence de vitesse entre les échantillons. Une fois cet alignement réalisé on peut extraire une distance entre les deux échantillons.
+
+\subsection{Discutez de l'intérêt des contraintes de localité}
+
+Le principe de la contrainte de localité est d’éviter que l’algorithme n’associe deux points d’une série s’ils sont trop éloignés, ce qui donnerait une distance DTW effectivement plus faible mais correspondrait à un alignement de séquences qui n’a pas de sens dans la realité. Celà permet également d’accélérer l’algorithme puisqu’il ne doit alors plus calculer de score d’association entre des points trop éloignés temporellement.
+
+\subsection{L'algorithme DTW est basé sur la programmation dynamique Donnez la formulation récursive correspondante}
+
+DTW(S1, S2, locality)
+
+\subsection{Donnez la complexité de l'algorithme en fonction des longueurs des signaux comparés et de la contrainte de localité}
+
+
+
+\section{Découpage optimal}
+
+\subsection{Formulez M(n) de manière récursive en précisant bien le cas de base}
+
+\subsection{Déduisez-en le pseudo-code d'un algorithme efficace pour calculer cette découpe}
+
+\subsection{Analysez la complexité au pire et au meilleur cas de votre algorithme en fonction des paramètres les plus appropriés}
+
+\part{Analyse Empirique}
+
+\subsection*{1 Vérification de la pertinence du DTW pour l'identification de chiffres isolés}
+
+\subsection*{2  Vérification du bon fonctionnement de l'algorithme de découpage}
+
+\subsection*{3  Etude de la robustesse de l'approche par rapport au locuteur}
+
+\subsection*{a) Calcul du nombre d'erreurs}
+
+\subsection*{b) Décodage des échantillons}
+
+\subsection*{c) Conclusion}
+
+\end{document} 
