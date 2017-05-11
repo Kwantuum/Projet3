@@ -3,16 +3,19 @@
 #include "Signal.h"
 #include "dynamicTimeWarping.h"
 
-static double** newMatrix(const size_t, const size_t);
-static size_t min2size_t(const size_t, const size_t);
-static size_t max2size_t(const size_t, const size_t);
-static double min3doubles(const double, const double, const double);
-static void freeMatrix(double**, const size_t);
+#include <stdio.h>
 
 typedef struct vector_t{
 	double* components;
 	size_t size;
 } vector;
+
+static double** newMatrix(const size_t, const size_t);
+static size_t min2size_t(const size_t, const size_t);
+static size_t max2size_t(const size_t, const size_t);
+static double min3doubles(const double, const double, const double);
+static void freeMatrix(double**, const size_t);
+static double meanOneNormDistance(const vector*, const vector*);
 
 /** ------------------------------------------------------------------------ *
  * Compute the dynamic time warp distance between two signals subject to a
@@ -32,31 +35,45 @@ double dtw(Signal* s1, Signal* s2, size_t locality){
 	// Checking that locality doesn't prevent calculation result
 	size_t maxSize = max2size_t(s1->size, s2->size);
 	size_t minSize = min2size_t(s1->size, s2->size);
+	// cap the locality at maxSize to prevent underflow in maxSize - locality
+	locality = locality > maxSize ? maxSize : locality;
 	if(maxSize - locality > minSize)
 		return DBL_MAX;
 
 	// Initializing cost matrix
-	height = s1->size + 1;
-	width = s2->size + 1;
+	size_t height = s1->size + 1;
+	size_t width = s2->size + 1;
 	double** DTWcosts = newMatrix(height, width);
 	for(size_t i = 0; i < height; i++)
 		for(size_t j = 0; j < width; j++)
 			DTWcosts[i][j] = DBL_MAX;
 	DTWcosts[0][0] = 0;
 
-	for(size_t i = 1; i < height; i++)
-		for(size_t j = max2size_t(1, i-locality); j <= min2size_t(width, i+locality); j++){
+	for(size_t i = 1; i < height; i++){
+		for(size_t j = max2size_t(1, i < locality ? 0 : i-locality); j < min2size_t(width, i+locality); j++){
+			if(s1->n_coef != s2->n_coef)
+				return DBL_MAX;
+			// build the vectors of 13 coefficients to be compared
+			double c1[s1->n_coef];
+			double c2[s2->n_coef];
+			for(size_t k = 0; k < s1->n_coef; k++){
+				c1[k] = s1->mfcc[k][i];
+				c2[k] = s2->mfcc[k][j];
+			}
+			vector v1 = {c1, s1->n_coef};
+			vector v2 = {c2, s2->n_coef};
 			// the base cost to associate two data points = the distance between them
-			double baseCost = meanOneNormDistance(	(vector){s1->mfcc[i], s1->size},
-													(vector){s2->mfcc[j], s2->size});
+			double baseCost = meanOneNormDistance(&v1, &v2);
 			// actual cost is base cost + minimal previous cost to get there
-			DTWcosts[i][j] = baseCost + min3doubles(DTW[i-1][j],
-													DTW[i][j-1],
-													DTW[i-1][j-1]);
+			DTWcosts[i][j] = baseCost + min3doubles(DTWcosts[i-1][j],
+													DTWcosts[i][j-1],
+													DTWcosts[i-1][j-1]);
 
 		}
+	}
 
-	totalDistance = DTWcosts[height][width];
+	double totalDistance;
+	printf("Calculated total distance: %lf\n", totalDistance = DTWcosts[height-1][width-1]);
 	freeMatrix(DTWcosts, height);
 	return totalDistance;// TODO
 }
@@ -101,8 +118,8 @@ static size_t min2size_t(const size_t a, const size_t b){
  *               The minimum of the three values
  * ------------------------------------------------------------------------- */
 static double min3doubles(const double a, const double b, const double c){
-	double maxAB = (a > b ? a : b);
-	return maxAB > c ? maxAB : c;
+	double minAB = (a < b ? a : b);
+	return minAB < c ? minAB : c;
 }
 /** ------------------------------------------------------------------------ *
  * Computes the mean one norm distance between two vectors
@@ -121,7 +138,7 @@ static double meanOneNormDistance(const vector* v1, const vector* v2){
 		return -1;
 
 	double sumOfDists = 0;
-	for(int i = 0; i < v1->size; i++){
+	for(size_t i = 0; i < v1->size; i++){
 		sumOfDists += abs(v1->components[i] - v2->components[i]);
 	}
 
