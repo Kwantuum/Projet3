@@ -57,8 +57,8 @@ double dtw(Signal* s1, Signal* s2, size_t locality){
 			double c1[s1->n_coef];
 			double c2[s2->n_coef];
 			for(size_t k = 0; k < s1->n_coef; k++){
-				c1[k] = s1->mfcc[k][i];
-				c2[k] = s2->mfcc[k][j];
+				c1[k] = s1->mfcc[k][i-1];
+				c2[k] = s2->mfcc[k][j-1];
 			}
 			vector v1 = {c1, s1->n_coef};
 			vector v2 = {c2, s2->n_coef};
