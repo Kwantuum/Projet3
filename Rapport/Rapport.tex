@@ -111,6 +111,58 @@ DTW(S1, S2, locality)
 
 \subsection*{1 Vérification de la pertinence du DTW pour l'identification de chiffres isolés}
 
+\label{tableau}
+
+\begin{center}
+
+
+\begin{table}[H]
+
+\begin{tabular}{|c|c|}
+
+\hline
+Contrainte de localité & Nombre d'erreurs \\
+\hline
+0 & 50 \\
+\hline
+1 & 40 \\
+\hline
+2 & 37 \\
+\hline
+3 & 29 \\
+\hline
+4 & 21 \\
+\hline
+5 & 15 \\
+\hline
+6 & 12 \\
+\hline
+7 & 11 \\
+\hline
+8 & 10 \\
+\hline
+9 & 9 \\
+\hline
+10 & 3 \\
+\hline
+11 & 1 \\
+\hline
+12 & 1 \\
+\hline
+13 & 1 \\
+\hline
+14 ou plus & 0 \\
+\hline
+
+
+
+\end{tabular}
+\caption{Nombre d'erreurs de reconnaissance en fonction de la contrainte de localité\protect\footnotemark}
+ 
+\end{table}
+\end{center}
+\footnotetext{Cette analyse est basée sur 50 échantillons de tests, 5 pour chaque nombre de 0 à 9}
+
 \subsection*{2  Vérification du bon fonctionnement de l'algorithme de découpage}
 
 \subsection*{3  Etude de la robustesse de l'approche par rapport au locuteur}
