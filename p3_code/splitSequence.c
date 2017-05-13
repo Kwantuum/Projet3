@@ -45,6 +45,26 @@ DigitSequence bestSplit(Signal* signal, Database* database,
                         size_t locality, size_t lMin, size_t lMax){
 	if(signal == NULL || database == NULL || signal->size < lMin)
 		return (DigitSequence){0, 0, NULL, NULL};
+		// return NULL           instead of your return ???
+	
+
+	
+	
+	// Initialise the DigitSequence structure
+	DigitSequence bestSplit = malloc(sizeof(DigitSequence));
+	if(!bestSplit)
+		return NULL;
+	// Decompose the source signal into sub_signals
+	
+	// For each i sub_signal
+	DigitScore digtScore = predictDigit(sub_signal, database, locality);
+	++bestSplit->nDigits;
+	bestSplit->score += digtScore.score;
+	bestSplit->digits[i] = digtScore.digit;
+	bestSplit->splits[i] = 
+	//
+	
+	
 }
 
 /* Takes a pointer to a source signal and puts a section of it into sub.
