@@ -1,4 +1,5 @@
 #include "splitSequence.h"
+#include "predictDigit.h"
 
 /**
  * A DigitSequence object contains all the information about the splitting of a sequence.
@@ -20,7 +21,9 @@
 //     size_t* splits;
 // } DigitSequence;
 
-static void subsignal(Signal *, Signal *, size_t, size_t);
+static Signal* subsignal(Signal *, size_t, size_t);
+
+static size_t condition(size_t , size_t , size_t );
 
 /** ------------------------------------------------------------------------ *
  * Given a signal containing a sequence of digits, find the best split of
@@ -45,39 +48,58 @@ DigitSequence bestSplit(Signal* signal, Database* database,
                         size_t locality, size_t lMin, size_t lMax){
 	if(signal == NULL || database == NULL || signal->size < lMin)
 		return (DigitSequence){0, 0, NULL, NULL};
-		// return NULL           instead of your return ???
 	
 
 	
 	
 	// Initialise the DigitSequence structure
-	DigitSequence bestSplit = malloc(sizeof(DigitSequence));
+	DigitSequence* bestSplit = malloc(sizeof(DigitSequence));
 	if(!bestSplit)
-		return NULL;
+		return (DigitSequence){0, 0, NULL, NULL};
+	
+	bestSplit->splits[0] = 0; // start
+	
 	// Decompose the source signal into sub_signals
+	for(size_t i = 0 ; i < signal->size - 1 ; i++)
+	{
+		bestSplit->splits[i+1] = condition(lMin, lMax, bestSplit->splits[i]); // stop
+		Signal* sub_signal = subsignal(signal, bestSplit->splits[i], bestSplit->splits[i+1]);
+		DigitScore digtScore = predictDigit(sub_signal, database, locality);
+		++bestSplit->nDigits;
+		bestSplit->score += digtScore.score;
+		bestSplit->digits[i] = digtScore.digit;	
+	}
 	
-	// For each i sub_signal
-	DigitScore digtScore = predictDigit(sub_signal, database, locality);
-	++bestSplit->nDigits;
-	bestSplit->score += digtScore.score;
-	bestSplit->digits[i] = digtScore.digit;
-	bestSplit->splits[i] = 
-	//
-	
-	
+	return *bestSplit;
 }
 
 /* Takes a pointer to a source signal and puts a section of it into sub.
  * The subsignal should already be initialized and its mfcc field have enough
  * allocated memory to contain the subsignal. */
-static void subsignal(Signal *sub, Signal *src, size_t start, size_t stop){
+static Signal* subsignal(Signal *src, size_t start, size_t stop){
 	// Check args
-	if(sub == NULL || src == NULL || start > stop
+	if(src == NULL || start > stop
 		|| start > src->size || stop > src->size)
-		return;
+		return NULL;
 
-	sub->size = stop - start + 1;
-	for(int i = 0; i < sub->size; i++)
-		for(j = 0; j < 13; j++)
-			sub->mfcc[j][i] = src[j][i+start];
+	Signal* sub_signal = malloc(sizeof(Signal));
+	sub_signal->size = stop - start + 1;
+	for(size_t i = 0; i < sub_signal->size; i++)
+		for(size_t j = 0; j < 13; j++)
+			sub_signal->mfcc[j][i] = src->mfcc[j][i+start];
+		
+	return sub_signal;
 }
+
+static size_t condition(size_t lMin, size_t lMax, size_t start)
+{
+	size_t i = start;
+	while(i)
+	{
+		if(lMin + start <= i && lMax + start >= i)
+			break;
+		i++;
+	}
+	return i;
+}
+		
