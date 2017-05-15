@@ -35,11 +35,18 @@ double dtw(Signal* s1, Signal* s2, size_t locality){
 	// Checking that locality doesn't prevent calculation result
 	size_t maxSize = max2size_t(s1->size, s2->size);
 	size_t minSize = min2size_t(s1->size, s2->size);
-	// cap the locality at maxSize to prevent underflow in maxSize - locality
+	
+	// Cap the locality at maxSize to prevent underflow in maxSize - locality
 	locality = locality > maxSize ? maxSize : locality;
 	if(maxSize - locality > minSize)
 		return DBL_MAX;
 
+	// Build the vectors of 13 coefficients to be compared
+	if(s1->n_coef != s2->n_coef)
+		return DBL_MAX;
+	double c1[s1->n_coef];
+	double c2[s2->n_coef];
+	
 	// Initializing cost matrix
 	size_t height = s1->size + 1;
 	size_t width = s2->size + 1;
@@ -49,22 +56,20 @@ double dtw(Signal* s1, Signal* s2, size_t locality){
 			DTWcosts[i][j] = DBL_MAX;
 	DTWcosts[0][0] = 0;
 
-	for(size_t i = 1; i < height; i++){
-		for(size_t j = max2size_t(1, i < locality ? 0 : i-locality); j < min2size_t(width, i+locality); j++){
-			if(s1->n_coef != s2->n_coef)
-				return DBL_MAX;
-			// build the vectors of 13 coefficients to be compared
-			double c1[s1->n_coef];
-			double c2[s2->n_coef];
-			for(size_t k = 0; k < s1->n_coef; k++){
+	for(size_t i = 1; i < height; i++)
+	{
+		for(size_t j = max2size_t(1, i < locality ? 0 : i-locality); j < min2size_t(width, i+locality); j++)
+		{
+			for(size_t k = 0; k < s1->n_coef; k++)
+			{
 				c1[k] = s1->mfcc[k][i-1];
 				c2[k] = s2->mfcc[k][j-1];
 			}
 			vector v1 = {c1, s1->n_coef};
 			vector v2 = {c2, s2->n_coef};
-			// the base cost to associate two data points = the distance between them
+			// The base cost to associate two data points = the distance between them
 			double baseCost = meanOneNormDistance(&v1, &v2);
-			// actual cost is base cost + minimal previous cost to get there
+			// Actual cost is base cost + minimal previous cost to get there
 			DTWcosts[i][j] = baseCost + min3doubles(DTWcosts[i-1][j],
 													DTWcosts[i][j-1],
 													DTWcosts[i-1][j-1]);
