@@ -85,7 +85,7 @@ Samuel Degueldre et Corentin Van Putte\\
 \section{DTW}
 \subsection{Expliquez brièvement le principe de cet algorithme}
 
-L’algorithme consiste à calculer une aligner deux séries temporelles en tenant compte d’éventuelles différence de vitesse entre les échantillons. Une fois cet alignement réalisé on peut extraire une distance entre les deux échantillons.
+L’algorithme consiste à calculer un alignement de deux séries temporelles en tenant compte d’éventuelles différences de vitesse entre les échantillons. Une fois cet alignement réalisé, on peut extraire une distance entre les deux échantillons.
 
 \subsection{Discutez de l'intérêt des contraintes de localité}
 
@@ -93,7 +93,14 @@ Le principe de la contrainte de localité est d’éviter que l’algorithme n�
 
 \subsection{L'algorithme DTW est basé sur la programmation dynamique Donnez la formulation récursive correspondante}
 
-DTW(S1, S2, locality)
+  \begin{equation*}
+    DTWcosts[i,j] =
+    \begin{cases}
+      0, & \text{si}\ i = 0 \hspace{0.1cm} et \hspace{0.1cm} j = 0 \\
+      +\infty, & \text{si}\ i = 0 \hspace{0.1cm} ou \hspace{0.1cm} j = 0 \\
+      basecosts +  & \text{sinon} \\ min(DTWcosts[i-1,j-1],\\DTWcosts[i,j-1],\\ DTWcosts[i-1,j-1]),
+    \end{cases}
+  \end{equation*}
 
 \subsection{Donnez la complexité de l'algorithme en fonction des longueurs des signaux comparés et de la contrainte de localité}
 
