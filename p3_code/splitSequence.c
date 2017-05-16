@@ -89,6 +89,6 @@ static void scoreSequence(Signal* signal, DigitSequence* sequence, Database* db,
 	for(int i = 0; i <= sequence->ndigits; i++){
 		score = dtw(subsignal(signal, sequence->splits[i], sequence->splits[i+1]), db, locality);
 		sequence->digits[i] = score.digit;
-		sequence->score += score.score
+		sequence->score += score.score;
 	}
 }
