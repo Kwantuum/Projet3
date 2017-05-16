@@ -21,6 +21,7 @@
 DigitScore predictDigit(Signal* signal, Database* database, size_t locality){
 	DigitScore digitScore = {DBL_MAX, -1};
 	for(int i = 0; i < 10; i++){
+		printf("Calculating DTWs with digit %d\n", i);
 		LLNode *reference = database->samples[i]->head;
 		while(reference != NULL){
 			double score = dtw(signal, (Signal *)reference->value, locality);
