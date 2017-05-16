@@ -22,8 +22,7 @@
 // } DigitSequence;
 
 static Signal* subsignal(Signal *, size_t, size_t);
-
-static size_t condition(size_t , size_t , size_t );
+static void scoreSequence(Signal*, DigitSequence *, Database *, size_t);
 
 /** ------------------------------------------------------------------------ *
  * Given a signal containing a sequence of digits, find the best split of
