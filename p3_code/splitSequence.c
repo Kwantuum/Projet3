@@ -49,26 +49,15 @@ DigitSequence bestSplit(Signal* signal, Database* database,
 	if(signal == NULL || database == NULL || signal->size < lMin)
 		return (DigitSequence){0, 0, NULL, NULL};
 	
-
-	
-	
-	// Initialise the DigitSequence structure
+	// Initialize the DigitSequence structure
 	DigitSequence* bestSplit = malloc(sizeof(DigitSequence));
 	if(!bestSplit)
 		return (DigitSequence){0, 0, NULL, NULL};
-	
-	bestSplit->splits[0] = 0; // start
+
 	
 	// Decompose the source signal into sub_signals
 	for(size_t i = 0 ; i < signal->size - 1 ; i++)
-	{
-		bestSplit->splits[i+1] = condition(lMin, lMax, bestSplit->splits[i]); // stop
-		Signal* sub_signal = subsignal(signal, bestSplit->splits[i], bestSplit->splits[i+1]);
-		DigitScore digtScore = predictDigit(sub_signal, database, locality);
-		++bestSplit->nDigits;
-		bestSplit->score += digtScore.score;
-		bestSplit->digits[i] = digtScore.digit;	
-	}
+	
 	
 	return *bestSplit;
 }
@@ -91,15 +80,15 @@ static Signal* subsignal(Signal *src, size_t start, size_t stop){
 	return sub_signal;
 }
 
-static size_t condition(size_t lMin, size_t lMax, size_t start)
-{
-	size_t i = start;
-	while(i)
-	{
-		if(lMin + start <= i && lMax + start >= i)
-			break;
-		i++;
+static void scoreSequence(Signal* signal, DigitSequence* sequence, Database* db, size_t locality){
+	if(signal == NULL || sequence == NULL)
+		return -1;
+
+	sequence->score = 0;
+	DigitScore score;
+	for(int i = 0; i <= sequence->ndigits; i++){
+		score = dtw(subsignal(signal, sequence->splits[i], sequence->splits[i+1]), db, locality);
+		sequence->digits[i] = score.digit;
+		sequence->score += score.score
 	}
-	return i;
 }
-		
