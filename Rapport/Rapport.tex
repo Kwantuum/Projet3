@@ -85,13 +85,18 @@ Samuel Degueldre et Corentin Van Putte\\
 \section{DTW}
 \subsection{Expliquez brièvement le principe de cet algorithme}
 
-L’algorithme consiste à calculer un alignement de deux séries temporelles en tenant compte d’éventuelles différences de vitesse entre les échantillons. Une fois cet alignement réalisé, on peut extraire une distance entre les deux échantillons.
+L’algorithme consiste à calculer un alignement de deux séries temporelles en tenant compte d’éventuelles différences de vitesse entre les échantillons. Une fois cet alignement réalisé, on peut extraire une distance entre les deux échantillons.\footnotemark[1]
+
+
 
 \subsection{Discutez de l'intérêt des contraintes de localité}
 
-Le principe de la contrainte de localité est d’éviter que l’algorithme n’associe deux points d’une série s’ils sont trop éloignés, ce qui donnerait une distance DTW effectivement plus faible mais correspondrait à un alignement de séquences qui n’a pas de sens dans la realité. Celà permet également d’accélérer l’algorithme puisqu’il ne doit alors plus calculer de score d’association entre des points trop éloignés temporellement.
+Le principe de la contrainte de localité est d’éviter que l’algorithme n’associe deux points d’une série s’ils sont trop éloignés, ce qui donnerait une distance DTW effectivement plus faible mais correspondrait à un alignement de séquences qui n’a pas de sens dans la realité. Celà permet également d’accélérer l’algorithme puisqu’il ne doit alors plus calculer de score d’association entre des points trop éloignés temporellement.\footnotemark[1]
+
+\footnotetext[1]{Sources : https://en.wikipedia.org/wiki/Dynamic$\_$time$\_$warping}
 
 \subsection{L'algorithme DTW est basé sur la programmation dynamique Donnez la formulation récursive correspondante}
+
 
   \begin{equation*}
     DTWcosts[i,j] =
@@ -104,7 +109,16 @@ Le principe de la contrainte de localité est d’éviter que l’algorithme n�
 
 \subsection{Donnez la complexité de l'algorithme en fonction des longueurs des signaux comparés et de la contrainte de localité}
 
-
+Soit S1 la longueur du premier signal, S2 la longueur du second signal et L la contrainte de localité.
+\\
+\\
+En général, c'est à dire lorsque L > S2, l'algorithme est $\Theta$(S1 $\times$ S2).
+\\
+\\
+En particulier, c'est à dire lorsque L <= S2, l'algorithme est $\Theta$(S1 $\times$ L).
+\\
+\\
+On notera tout de même que la matrice du DTW doit être dans tous les cas initialisée. Cette matrice ayant une taille S1 $\times$ S2, l'initialisation de la matrice est $\Theta$(S1 $\times$ S2).
 
 \section{Découpage optimal}
 
@@ -164,11 +178,11 @@ Contrainte de localité & Nombre d'erreurs \\
 
 
 \end{tabular}
-\caption{Nombre d'erreurs de reconnaissance en fonction de la contrainte de localité\protect\footnotemark}
+\caption{Nombre d'erreurs de reconnaissance en fonction de la contrainte de localité\protect\footnotemark[2]}
  
 \end{table}
 \end{center}
-\footnotetext{Cette analyse est basée sur 50 échantillons de tests, 5 pour chaque nombre de 0 à 9}
+\footnotetext[2]{Cette analyse est basée sur 50 échantillons de tests, 5 pour chaque nombre de 0 à 9}
 
 \subsection*{2  Vérification du bon fonctionnement de l'algorithme de découpage}
 
