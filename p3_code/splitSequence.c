@@ -1,5 +1,6 @@
 #include "splitSequence.h"
 #include "predictDigit.h"
+#include <math.h>
 
 /**
  * A DigitSequence object contains all the information about the splitting of a sequence.
@@ -47,15 +48,16 @@ DigitSequence bestSplit(Signal* signal, Database* database,
                         size_t locality, size_t lMin, size_t lMax){
 	if(signal == NULL || database == NULL || signal->size < lMin)
 		return (DigitSequence){0, 0, NULL, NULL};
+
+	// Make sure that there exists at least one way to split the sequence
+	if(!(floor(signal->size / lMin) >= floor(signal->size / lMax)))
+		return (DigitSequence){0, 0, NULL, NULL};
 	
 	// Initialize the DigitSequence structure
 	DigitSequence* bestSplit = malloc(sizeof(DigitSequence));
 	if(!bestSplit)
 		return (DigitSequence){0, 0, NULL, NULL};
 
-	
-	// Decompose the source signal into sub_signals
-	for(size_t i = 0 ; i < signal->size - 1 ; i++)
 	
 	
 	return *bestSplit;
