@@ -115,7 +115,7 @@ Soit S1 la longueur du premier signal, S2 la longueur du second signal et L la c
 En général, c'est à dire lorsque L > S2, l'algorithme est $\Theta$(S1 $\times$ S2).
 \\
 \\
-En particulier, c'est à dire lorsque L <= S2, l'algorithme est $\Theta$(S1 $\times$ L).
+En particulier, c'est à dire lorsque L $\le$ S2, l'algorithme est $\Theta$(S1 $\times$ L).
 \\
 \\
 On notera tout de même que la matrice du DTW doit être dans tous les cas initialisée. Cette matrice ayant une taille S1 $\times$ S2, l'initialisation de la matrice est $\Theta$(S1 $\times$ S2).
@@ -124,7 +124,156 @@ On notera tout de même que la matrice du DTW doit être dans tous les cas initi
 
 \subsection{Formulez M(n) de manière récursive en précisant bien le cas de base}
 
+  \begin{equation*}
+    M(n) =
+    \begin{cases}
+      +\infty, & \text{si}\ size \ge lMax \hspace{0.1cm} ou \hspace{0.1cm} size < 2 \times lMin \\ & et \hspace{0.1cm} size < lMin \\ & et \hspace{0.1cm} \frac{size}{lMin} < \frac{size}{lMax} \\
+      \\
+      predictDigit(n, database, locality),  & \text{sinon}
+    \end{cases}
+  \end{equation*}
+  
+  où size est la taille du sous-signal.
+\newpage
+
 \subsection{Déduisez-en le pseudo-code d'un algorithme efficace pour calculer cette découpe}
+
+\begin{center}
+\begin{enumerate}
+\large
+\item[] \textit{BESTSPLIT}(signal, database, locality, lMin, lMax)
+\item
+\textbf{if} signal.length / lMin < signal.length / lMax
+\item \hspace{1cm}
+\textbf{return} +$\infty$
+\item
+Let splitScores[i...signal.length, j...signal.length] be a matrix
+\item
+\textbf{for} i = 0 \textbf{to} signal.length
+\item \hspace{1cm}
+\textbf{for} j = 0 \textbf{to} signal.length
+\item \hspace{2cm}
+splitScore[i,j].digit = -1
+\item
+returnSequence = \textit{BESTSPLITWRAPPER}(signal, database, locality,
+\item \hspace{7cm} lMin, lMax, splitScores, 0, 
+\item \hspace{7cm} signal.size - 1)
+\item
+\textbf{return} returnSequence
+\end{enumerate}
+
+\begin{enumerate}
+\vspace{1cm}
+\large
+\item[] \textit{BESTSPLITWRAPPER}(signal, database, locality, lMin, lMax,
+\item[] \hspace{4cm} splitScores, start, stop)
+\item
+size = stop - start
+\item
+\textbf{if} size < lMin \textbf{or} size / lMin < size / lMax
+\item \hspace{1cm}
+\textbf{return} +$\infty$
+\item
+bSplit = +$\infty$
+\item
+\textbf{if} size $\ge$ 2$\times$lMin
+\item \hspace{1cm}
+\textbf{for} i = start + lMin \textbf{to} start + lMax + 1 \textbf{and} signal.length
+\item \hspace{2cm}
+rightSize = stop - i
+\item \hspace{2cm}
+\textbf{if} rightSize / lMin $\ge$ rightSize / lMax
+\item \hspace{4.7cm}
+\textbf{and} rightSize $\ge$ lMin
+\item \hspace{3cm}
+\textbf{if} splitScores[start,i].digit == -1
+\item \hspace{4cm}
+leftDigit = \textit{SPLITSCORE}(signal, database, 
+\item \hspace{8.5cm}
+locality, start, i,
+\item \hspace{8.5cm} 
+splitScores)
+\item \hspace{3cm}
+\textbf{else}
+\item \hspace{4cm}
+leftDigit = splitScores[start,i]
+\item \hspace{3cm}
+bestRightSplit = \textit{BESTSPLITWRAPPER}(signal, 
+\item \hspace{5.8cm}
+database, locality, lMin, lMax, 
+\item \hspace{5.8cm}
+splitScores, i, stop)
+\item \hspace{3cm}
+newSplit = \textit{UNITE}(leftDigit, bestRightSplit, start)
+\item \hspace{3cm}
+\textbf{if} newSplit.score < bSplit.score
+\item \hspace{4cm}
+bSplit = newSplit
+\item
+\textbf{if} size < lMax
+\item \hspace{1cm}
+\textbf{if} splitScores[start,stop].digit == -1
+\item \hspace{2cm}
+seqScore = \textit{SPLITSCORE}(signal, database, locality, start, 
+\item \hspace{6.4cm}
+stop, splitScores)
+\item \hspace{1cm}
+\textbf{else}
+\item \hspace{2cm}
+seqScore = splitScore[start,stop]
+\item \hspace{1cm}
+\textbf{if} bSplit.score > seqScore.score
+\item \hspace{2cm}
+bSplit.nDigits = 1
+\item \hspace{2cm}
+bSplit.score = seqScore.score
+\item \hspace{2cm}
+bSplit.digits[0] = seqScore.digit
+\item \hspace{2cm}
+bSplit.splits[0] = start
+\item
+\textbf{return} bSplit
+\end{enumerate}
+
+\vspace{1cm}
+
+\begin{enumerate}
+\large
+\item[] \textit{SPLITSCORE}(signal, database, locality, start, stop, splitScores)
+
+\item \textbf{if} splitScores[start,stop].digit == -1
+\item \hspace{1cm}
+Let subsignal be a signal of size [start,stop]
+\item \hspace{1cm}
+splitScores[start,stop] = \textit{PREDICTDIGIT}(subsignal, database,
+\item \hspace{8.1cm}
+ locality)
+ \item
+\textbf{return} splitScores[start,stop]
+\end{enumerate}
+
+\vspace{1cm}
+
+\begin{enumerate}
+\large
+\item[] \textit{UNITE}(dscore, seq, start)
+\item
+	retSeq.nDigits = seq.nDigits + 1
+\item
+	retSeq.score = dscore.score + seq.score
+\item
+	retSeq.digits[0] = dscore.digit
+\item
+	retSeq.splits[0] = start
+\item
+	\textbf{for} i = 1 \textbf{to} retSeq.nDigits
+\item \hspace{1cm}
+		retSeq.digits[i] = seq.digits[i-1]
+	\item \hspace{1cm}
+		retSeq.splits[i] = seq.splits[i-1]
+\item \textbf{return} retSeq
+\end{enumerate}
+\end{center}
 
 \subsection{Analysez la complexité au pire et au meilleur cas de votre algorithme en fonction des paramètres les plus appropriés}
 
@@ -186,12 +335,5 @@ Contrainte de localité & Nombre d'erreurs \\
 
 \subsection*{2  Vérification du bon fonctionnement de l'algorithme de découpage}
 
-\subsection*{3  Etude de la robustesse de l'approche par rapport au locuteur}
-
-\subsection*{a) Calcul du nombre d'erreurs}
-
-\subsection*{b) Décodage des échantillons}
-
-\subsection*{c) Conclusion}
 
 \end{document} 
