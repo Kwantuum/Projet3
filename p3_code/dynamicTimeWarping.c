@@ -1,9 +1,6 @@
-#include <stddef.h>
 #include <float.h>
 #include "Signal.h"
 #include "dynamicTimeWarping.h"
-
-#include <stdio.h>
 
 typedef struct vector_t{
 	double* components;
@@ -41,7 +38,7 @@ double dtw(Signal* s1, Signal* s2, size_t locality){
 	if(maxSize - locality > minSize)
 		return DBL_MAX;
 
-	// Build the vectors of 13 coefficients to be compared
+	// Build the vectors of n_coef coefficients to be compared
 	if(s1->n_coef != s2->n_coef)
 		return DBL_MAX;
 	double c1[s1->n_coef];
@@ -77,10 +74,9 @@ double dtw(Signal* s1, Signal* s2, size_t locality){
 		}
 	}
 
-	double totalDistance;
-	printf("Calculated total distance: %lf\n", totalDistance = DTWcosts[height-1][width-1]);
+	double totalDistance = DTWcosts[height-1][width-1];
 	freeMatrix(DTWcosts, height);
-	return totalDistance;// TODO
+	return totalDistance;
 }
 
 /** ------------------------------------------------------------------------ *
