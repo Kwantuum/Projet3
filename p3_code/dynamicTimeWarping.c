@@ -37,7 +37,7 @@ double dtw(Signal* s1, Signal* s2, size_t locality){
 	size_t minSize = min2size_t(s1->size, s2->size);
 	
 	// Cap the locality at maxSize to prevent underflow in maxSize - locality
-	locality = locality > maxSize ? maxSize : locality;
+	locality = (locality > maxSize) ? maxSize : locality;
 	if(maxSize - locality > minSize)
 		return DBL_MAX;
 
@@ -58,7 +58,7 @@ double dtw(Signal* s1, Signal* s2, size_t locality){
 
 	for(size_t i = 1; i < height; i++)
 	{
-		for(size_t j = max2size_t(1, i < locality ? 0 : i-locality); j < min2size_t(width, i+locality); j++)
+		for(size_t j = max2size_t(1, (i < locality) ? 0 : i-locality); j < min2size_t(width, i+locality+1); j++)
 		{
 			for(size_t k = 0; k < s1->n_coef; k++)
 			{
