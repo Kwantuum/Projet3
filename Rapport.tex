@@ -1,0 +1,408 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[frenchb]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+%\usepackage{a4wide}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathptmx}
+\usepackage{longtable}
+\usepackage[font=small]{caption}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage[dvipsnames,usenames]{color}
+\usepackage{fancyhdr}
+\usepackage{epstopdf}
+\usepackage{bm}
+\usepackage{array}
+\usepackage{mathtools}
+\usepackage[toc,page]{appendix}
+\usepackage{gensymb}
+\usepackage{eurosym}
+\usepackage{epstopdf}
+\usepackage{textcomp}
+\usepackage{tikz}
+\usepackage{amsmath} 
+
+
+\addto\captionsfrench{\def\tablename{Tableau}}
+
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+
+\DeclareUnicodeCharacter{00A0}{~}
+\newcommand{\matr}[1]{\underline{\underline{#1}}}
+
+
+
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+\hypersetup{
+  colorlinks   = true,
+  linkcolor    = black,
+  urlcolor     = black,
+  citecolor    = black
+}
+
+\begin{document}
+
+
+
+
+
+
+
+\setcounter{page}{1}
+
+
+\begin{center}
+
+
+\rule{\linewidth}{0.3mm}
+\LARGE
+INFO0902-1 Structures des données et algorithmes\\
+\vspace{0.3cm}
+\large
+\textbf{Projet 3: Résolution de problèmes}\\
+\vspace{0.3cm}
+\normalsize
+\textit{Bachelier en sciences de l'ingénieur, Bloc 2}\\
+\vspace{0.2cm}
+Samuel Degueldre et Corentin Van Putte\\
+\vspace{0.2cm}
+2016 - 2017\\
+\LARGE
+\rule{\linewidth}{0.3mm}
+ 
+
+\end{center}
+\part{Analyse Théorique}
+
+
+\section{DTW}
+\subsection{Expliquez brièvement le principe de cet algorithme}
+
+L’algorithme consiste à calculer un alignement de deux séries temporelles en tenant compte d’éventuelles différences de vitesse entre les échantillons. Une fois cet alignement réalisé, on peut extraire une distance entre les deux échantillons.\footnotemark[1]
+
+
+
+\subsection{Discutez de l'intérêt des contraintes de localité}
+
+Le principe de la contrainte de localité est d’éviter que l’algorithme n’associe deux points d’une série s’ils sont trop éloignés, ce qui donnerait une distance DTW effectivement plus faible mais correspondrait à un alignement de séquences qui n’a pas de sens dans la realité. Celà permet également d’accélérer l’algorithme puisqu’il ne doit alors plus calculer de score d’association entre des points trop éloignés temporellement.\footnotemark[1]
+
+\footnotetext[1]{Sources : https://en.wikipedia.org/wiki/Dynamic$\_$time$\_$warping}
+
+\subsection{L'algorithme DTW est basé sur la programmation dynamique Donnez la formulation récursive correspondante}
+
+
+  \begin{equation*}
+    DTWcosts[i,j] =
+    \begin{cases}
+      0, & \text{si}\ i = 0 \hspace{0.1cm} et \hspace{0.1cm} j = 0 \\
+      +\infty, & \text{si}\ i = 0 \hspace{0.1cm} ou \hspace{0.1cm} j = 0 \\
+      basecosts +  & \text{sinon} \\ min(DTWcosts[i-1,j-1],\\DTWcosts[i,j-1],\\ DTWcosts[i-1,j-1]),
+    \end{cases}
+  \end{equation*}
+
+\subsection{Donnez la complexité de l'algorithme en fonction des longueurs des signaux comparés et de la contrainte de localité}
+
+Soit S1 la longueur du premier signal, S2 la longueur du second signal et L la contrainte de localité.
+\\
+\\
+En général, c'est à dire lorsque L > S2, l'algorithme est $\Theta$(S1 $\times$ S2).
+\\
+\\
+En particulier, c'est à dire lorsque L $\le$ S2, l'algorithme est $\Theta$(S1 $\times$ L).
+\\
+\\
+On notera tout de même que la matrice du DTW doit être dans tous les cas initialisée. Cette matrice ayant une taille S1 $\times$ S2, l'initialisation de la matrice est $\Theta$(S1 $\times$ S2).
+
+\section{Découpage optimal}
+
+\subsection{Formulez M(n) de manière récursive en précisant bien le cas de base}
+
+  \begin{equation*}
+    M(n) =
+    \begin{cases}
+      +\infty, & \text{si}\ size \ge lMax \hspace{0.1cm} ou \hspace{0.1cm} size < 2 \times lMin \\ & et \hspace{0.1cm} size < lMin \\ & et \hspace{0.1cm} \frac{size}{lMin} < \frac{size}{lMax} \\
+      \\
+      predictDigit(n, database, locality),  & \text{sinon}
+    \end{cases}
+  \end{equation*}
+  
+  où size est la taille du sous-signal.
+\newpage
+
+\subsection{Déduisez-en le pseudo-code d'un algorithme efficace pour calculer cette découpe}
+
+\begin{center}
+\begin{enumerate}
+\large
+\item[] \textit{BESTSPLIT}(signal, database, locality, lMin, lMax)
+\item
+\textbf{if} signal.length / lMin < signal.length / lMax
+\item \hspace{1cm}
+\textbf{return} +$\infty$
+\item
+Let splitScores[i...signal.length, j...signal.length] be a matrix
+\item
+\textbf{for} i = 0 \textbf{to} signal.length
+\item \hspace{1cm}
+\textbf{for} j = 0 \textbf{to} signal.length
+\item \hspace{2cm}
+splitScore[i,j].digit = -1
+\item
+returnSequence = \textit{BESTSPLITWRAPPER}(signal, database, locality,
+\item \hspace{7cm} lMin, lMax, splitScores, 0, 
+\item \hspace{7cm} signal.size - 1)
+\item
+\textbf{return} returnSequence
+\end{enumerate}
+
+\begin{enumerate}
+\vspace{1cm}
+\large
+\item[] \textit{BESTSPLITWRAPPER}(signal, database, locality, lMin, lMax,
+\item[] \hspace{4cm} splitScores, start, stop)
+\item
+size = stop - start
+\item
+\textbf{if} size < lMin \textbf{or} size / lMin < size / lMax
+\item \hspace{1cm}
+\textbf{return} +$\infty$
+\item
+bSplit = +$\infty$
+\item
+\textbf{if} size $\ge$ 2$\times$lMin
+\item \hspace{1cm}
+\textbf{for} i = start + lMin \textbf{to} start + lMax + 1 \textbf{and} signal.length
+\item \hspace{2cm}
+rightSize = stop - i
+\item \hspace{2cm}
+\textbf{if} rightSize / lMin $\ge$ rightSize / lMax
+\item \hspace{4.7cm}
+\textbf{and} rightSize $\ge$ lMin
+\item \hspace{3cm}
+\textbf{if} splitScores[start,i].digit == -1
+\item \hspace{4cm}
+leftDigit = \textit{SPLITSCORE}(signal, database, 
+\item \hspace{8.5cm}
+locality, start, i,
+\item \hspace{8.5cm} 
+splitScores)
+\item \hspace{3cm}
+\textbf{else}
+\item \hspace{4cm}
+leftDigit = splitScores[start,i]
+\item \hspace{3cm}
+bestRightSplit = \textit{BESTSPLITWRAPPER}(signal, 
+\item \hspace{5.8cm}
+database, locality, lMin, lMax, 
+\item \hspace{5.8cm}
+splitScores, i, stop)
+\item \hspace{3cm}
+newSplit = \textit{UNITE}(leftDigit, bestRightSplit, start)
+\item \hspace{3cm}
+\textbf{if} newSplit.score < bSplit.score
+\item \hspace{4cm}
+bSplit = newSplit
+\item
+\textbf{if} size < lMax
+\item \hspace{1cm}
+\textbf{if} splitScores[start,stop].digit == -1
+\item \hspace{2cm}
+seqScore = \textit{SPLITSCORE}(signal, database, locality, start, 
+\item \hspace{6.4cm}
+stop, splitScores)
+\item \hspace{1cm}
+\textbf{else}
+\item \hspace{2cm}
+seqScore = splitScore[start,stop]
+\item \hspace{1cm}
+\textbf{if} bSplit.score > seqScore.score
+\item \hspace{2cm}
+bSplit.nDigits = 1
+\item \hspace{2cm}
+bSplit.score = seqScore.score
+\item \hspace{2cm}
+bSplit.digits[0] = seqScore.digit
+\item \hspace{2cm}
+bSplit.splits[0] = start
+\item
+\textbf{return} bSplit
+\end{enumerate}
+
+\vspace{1cm}
+
+\begin{enumerate}
+\large
+\item[] \textit{SPLITSCORE}(signal, database, locality, start, stop, splitScores)
+
+\item \textbf{if} splitScores[start,stop].digit == -1
+\item \hspace{1cm}
+Let subsignal be a signal of size [start,stop]
+\item \hspace{1cm}
+splitScores[start,stop] = \textit{PREDICTDIGIT}(subsignal, database,
+\item \hspace{8.1cm}
+ locality)
+ \item
+\textbf{return} splitScores[start,stop]
+\end{enumerate}
+
+\vspace{1cm}
+
+\begin{enumerate}
+\large
+\item[] \textit{UNITE}(dscore, seq, start)
+\item
+	retSeq.nDigits = seq.nDigits + 1
+\item
+	retSeq.score = dscore.score + seq.score
+\item
+	retSeq.digits[0] = dscore.digit
+\item
+	retSeq.splits[0] = start
+\item
+	\textbf{for} i = 1 \textbf{to} retSeq.nDigits
+\item \hspace{1cm}
+		retSeq.digits[i] = seq.digits[i-1]
+	\item \hspace{1cm}
+		retSeq.splits[i] = seq.splits[i-1]
+\item \textbf{return} retSeq
+\end{enumerate}
+\end{center}
+
+\subsection{Analysez la complexité au pire et au meilleur cas de votre algorithme en fonction des paramètres les plus appropriés}
+
+L'algorithme ne possède ni meilleur cas, ni pire cas.
+
+Sa complexité est $\Theta$(DTW$\times$$(lMax-lMin)^{2}$)
+\\
+\\
+Comme dit précédément (au point 1.4), la complexité du DTW est $\Theta$(S1 $\times$ S2) quand L > S2 et $\Theta$(S1 $\times$ L) quand L $\le$ S2.
+\\
+\\
+On en déduit donc que la complexité du découpage optimal est :
+\\
+\\
+Si L > S2 : $\Theta$(S1 $\times$ S2 $\times$$(lMax-lMin)^{2}$)
+\\
+Si L $\le$ S2 : $\Theta$(S1 $\times$ L $\times$$(lMax-lMin)^{2}$)
+
+\part{Analyse Empirique}
+
+\subsection*{1 Vérification de la pertinence du DTW pour l'identification de chiffres isolés}
+
+\label{tableau}
+
+\begin{center}
+
+
+\begin{table}[H]
+
+\begin{tabular}{|c|c|}
+
+\hline
+Contrainte de localité & Nombre d'erreurs \\
+\hline
+0 & 50 \\
+\hline
+1 & 40 \\
+\hline
+2 & 37 \\
+\hline
+3 & 29 \\
+\hline
+4 & 21 \\
+\hline
+5 & 15 \\
+\hline
+6 & 12 \\
+\hline
+7 & 11 \\
+\hline
+8 & 10 \\
+\hline
+9 & 9 \\
+\hline
+10 & 3 \\
+\hline
+11 & 1 \\
+\hline
+12 & 1 \\
+\hline
+13 & 1 \\
+\hline
+14 ou plus & 0 \\
+\hline
+
+
+
+\end{tabular}
+\caption{Nombre d'erreurs de reconnaissance en fonction de la contrainte de localité\protect\footnotemark[2]}
+ 
+\end{table}
+\end{center}
+\footnotetext[2]{Cette analyse est basée sur 50 échantillons de tests, 5 pour chaque nombre de 0 à 9}
+
+On remarque qu'à partir d'une contrainte de localité de 14, le DTW ne commet plus aucune erreur sur les échantillons de test, et ainsi, augmenter encore la localité est inutile.
+\\
+\\
+On remarque également qu'avec une contrainte de localité égale à 0, l'algorithme commet 50 erreurs, c'est à dire qu'il ne reconnait aucun signal. C'est parce que quand la contrainte de localité est fixée à 0, l'algorithme est capable de détecter le bon nombre que si et seulement si les deux signaux (le signal de test et le signal de la database) sont les mêmes.
+\subsection*{2  Vérification du bon fonctionnement de l'algorithme de découpage}
+
+\label{tableau}
+
+\begin{center}
+
+
+\begin{table}[H]
+
+\begin{tabular}{|c|c|}
+
+\hline
+Séquence n° & Séquence obtenue \\
+\hline
+1 & 0 4 7 3 \\
+\hline
+2 & 1 2 3 9 \\
+\hline
+3 & 1 9 7 5 \\
+\hline
+4 & 2 0 3 6 \\
+\hline
+5 & 3 4 8 2 \\
+\hline
+6 & 4 8 1 5 \\
+\hline
+7 & 5 4 3 2 \\
+\hline
+8 & 9 9 8 4 \\
+\hline
+
+
+\end{tabular}
+\caption{Séquence de chiffres obtenue en fonction du numéro de la séquence}
+ 
+\end{table}
+\end{center}
+Afin d'augmenter la rapidité de l'algorithme ainsi que sa précision, nous avons du imposer les paramètres suivants :
+\\
+-locality = 25
+\\
+-lMin = 35
+\\
+-lMax = 70
+\\
+\\
+Nous avons pris une contrainte de localité de 25 car c'était une valeur qui permettait un bon rapport précision/rapidité.
+A noter qu'une contrainte de localité plus petite permettrait une plus grande rapidité de l'algorithme mais réduirait sa précision, et inversément.
+\\
+\\
+Nous avons pris l'intervalle [35;70] ([lMin;lMax]) car les échantillons de la base de donnée sont compris dans cet intervalle.
+A noter que tous les échantillons n'ont pas une valeur proche des bornes de cet intervalle mais celà permet d'avoir une marge de sécurité, pour éviter qu'un signal ayant une valeur proche des bornes ne vienne fausser les résultats.
+
+\end{document} 

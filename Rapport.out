@@ -1,0 +1,11 @@
+\BOOKMARK [0][-]{part.1}{I Analyse Th\351orique}{}% 1
+\BOOKMARK [1][-]{section.1}{DTW}{part.1}% 2
+\BOOKMARK [2][-]{subsection.1.1}{Expliquez bri\350vement le principe de cet algorithme}{section.1}% 3
+\BOOKMARK [2][-]{subsection.1.2}{Discutez de l'int\351r\352t des contraintes de localit\351}{section.1}% 4
+\BOOKMARK [2][-]{subsection.1.3}{L'algorithme DTW est bas\351 sur la programmation dynamique Donnez la formulation r\351cursive correspondante}{section.1}% 5
+\BOOKMARK [2][-]{subsection.1.4}{Donnez la complexit\351 de l'algorithme en fonction des longueurs des signaux compar\351s et de la contrainte de localit\351}{section.1}% 6
+\BOOKMARK [1][-]{section.2}{D\351coupage optimal}{part.1}% 7
+\BOOKMARK [2][-]{subsection.2.1}{Formulez M\(n\) de mani\350re r\351cursive en pr\351cisant bien le cas de base}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.2}{D\351duisez-en le pseudo-code d'un algorithme efficace pour calculer cette d\351coupe}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.3}{Analysez la complexit\351 au pire et au meilleur cas de votre algorithme en fonction des param\350tres les plus appropri\351s}{section.2}% 10
+\BOOKMARK [0][-]{part.2}{II Analyse Empirique}{}% 11
